@@ -1,3 +1,5 @@
+{%- set py_version = salt['grains.get']('pythonversion')|join('.') %}
+{%- set python_docker = 'python3-docker' if salt['pkg.version_cmp'](py_version, '3') >= 0 else 'python-docker' %}
 
 {% set host = salt['grains.filter_by']({
     'CentOS': {
@@ -13,7 +15,7 @@
         'service': 'docker',
     },
     'Ubuntu': {
-        'pkgs': ['docker-engine', 'python-docker'],
+        'pkgs': ['docker-engine', python_docker],
         'service': 'docker',
     },
 }, grain='os', merge=salt['pillar.get']('docker:host')) %}
@@ -29,7 +31,7 @@
 
 {% set client = salt['grains.filter_by']({
     'default': {
-        'pkgs': ['python-docker'],
+        'pkgs': [python_docker],
         'compose': {
           'base': '/etc/docker/compose',
           'source': {
